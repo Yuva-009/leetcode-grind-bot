@@ -61,7 +61,7 @@ async def post_init(application):
         name="daily_reminder"
     )
     
-    )
+    
 
     # Schedule 12:00 AM poll
     job_queue.run_daily(
