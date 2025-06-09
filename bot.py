@@ -1,76 +1,81 @@
-import nest_asyncio
-import asyncio
-from datetime import time
+import os
 import pytz
-
+import logging
 from telegram import Update, Poll
 from telegram.ext import (
-    ApplicationBuilder,
-    ContextTypes,
-    CommandHandler,
-    ChatMemberHandler,
-    filters,
+    ApplicationBuilder, CommandHandler, MessageHandler,
+    filters, ContextTypes, ChatMemberHandler
 )
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from telegram.ext import JobQueue
 
-# === PATCH THE EVENT LOOP ===
-nest_asyncio.apply()
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+PORT = int(os.environ.get("PORT", 8443))
+TIMEZONE = pytz.timezone("Asia/Kolkata")
 
-# === Replace these ===
-TOKEN = "7842828813:AAG7QpuH7JIYDqLFtq66SCVekqoDeIK1lbg"  # Replace with your bot token
-GROUP_CHAT_ID = -1002556002177  # Replace with your group ID
+logging.basicConfig(level=logging.INFO)
 
-IST = pytz.timezone("Asia/Kolkata")
-
-# === Handlers ===
+# === HANDLERS ===
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Bot is live and ready to grind 💪")
+    await update.message.reply_text("🚀 Bot is live with Webhook mode!")
+
+async def daily_reminder(context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=os.getenv("GROUP_CHAT_ID"),
+        text="🌟 It's 6:30 PM! Time to share your DSA & Spring Boot progress! 🚀"
+    )
+
+async def send_poll(context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_poll(
+        chat_id=os.getenv("GROUP_CHAT_ID"),
+        question="🧠 How many problems did you solve today?",
+        options=["1", "2", "3", "3+ 🤯"],
+        is_anonymous=False
+    )
 
 async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    for member in update.chat_member.new_chat_members:
+    new_member = update.chat_member.new_chat_member
+    if new_member.status == "member":
         await context.bot.send_message(
             chat_id=update.chat_member.chat.id,
             text=(
-                f"👋 Welcome {member.mention_html()} to the DSA & Dev grind group!\n"
-                f"🚀 Drop a quick intro and tell us how far you're in DSA and Java/Spring Boot."
+                f"👋 Welcome, {new_member.user.mention_html()}!\n"
+                "Please introduce yourself and tell us how your DSA and Java/Spring Boot journey is going! 🚀"
             ),
             parse_mode="HTML"
         )
 
-# === Scheduled Jobs ===
+# === MAIN FUNCTION ===
 
-async def send_reminder(bot):
-    await bot.send_message(
-        chat_id=GROUP_CHAT_ID,
-        text="⏰ It's 6:30 PM! Time to wrap up distractions and grind some LeetCode 💻"
+async def post_init(application):
+    job_queue = application.job_queue
+
+    # Schedule 6:30 PM reminder
+    job_queue.run_daily(
+        callback=daily_reminder,
+        time=pytz.time(18, 30, 0, tzinfo=TIMEZONE),
+        name="daily_reminder"
     )
 
-async def send_midnight_poll(bot):
-    await bot.send_poll(
-        chat_id=GROUP_CHAT_ID,
-        question="🌙 Midnight Check: How many problems did you solve today?",
-        options=["1", "2", "3", "3+ 🔥"],
-        is_anonymous=False,
-        allows_multiple_answers=False,
+    # Schedule 12:00 AM poll
+    job_queue.run_daily(
+        callback=send_poll,
+        time=pytz.time(0, 0, 0, tzinfo=TIMEZONE),
+        name="midnight_poll"
     )
 
-# === Main ===
 
-async def main():
-    app = ApplicationBuilder().token(TOKEN).build()
+if __name__ == "__main__":
+    app = ApplicationBuilder().token(BOT_TOKEN).post_init(post_init).build()
 
+    # Handlers
     app.add_handler(CommandHandler("start", start))
     app.add_handler(ChatMemberHandler(welcome, ChatMemberHandler.CHAT_MEMBER))
 
-    scheduler = AsyncIOScheduler(timezone=IST)
-
-    scheduler.add_job(send_reminder, 'cron', hour=18, minute=30, args=[app.bot])
-    scheduler.add_job(send_midnight_poll, 'cron', hour=0, minute=0, args=[app.bot])
-
-    scheduler.start()
-    print("✅ Bot and scheduler started successfully")
-    await app.run_polling()
-
-# Run without crashing event loop
-asyncio.get_event_loop().run_until_complete(main())
+    # Run in webhook mode
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        url_path=BOT_TOKEN,
+        webhook_url=f"https://<your-render-url>.onrender.com/{BOT_TOKEN}"
+    )
