@@ -79,5 +79,5 @@ if __name__ == "__main__":
         listen="0.0.0.0",
         port=PORT,
         url_path=BOT_TOKEN,
-        webhook_url=f"https://<your-render-url>.onrender.com/{BOT_TOKEN}"
+        webhook_url=f"https://leetcode-grind-bot-1.onrender.com/{BOT_TOKEN}"
     )
