@@ -1,51 +1,56 @@
+import logging
 from telegram import Update
 from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    MessageHandler,
-    ContextTypes,
-    filters,
+    ApplicationBuilder, CommandHandler, MessageHandler,
+    filters, ContextTypes
 )
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-# Replace these
-TOKEN = "7842828813:AAG7QpuH7JIYDqLFtq66SCVekqoDeIK1lbg"
-GROUP_CHAT_ID = -1002556002177  # Replace with your Telegram group chat ID
+# Set up logging
+logging.basicConfig(level=logging.INFO)
 
-# 1. Daily reminder at 6:30 PM IST
-async def send_daily_reminder(context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=GROUP_CHAT_ID, text="⏰ It's 6:30 PM! Time to grind, you awesome coders 💻🔥")
+BOT_TOKEN = "7842828813:AAG7QpuH7JIYDqLFtq66SCVekqoDeIK1lbg"
+GROUP_CHAT_ID = -1002556002177  # Replace with actual group chat ID
 
-# 2. Daily poll at 12:00 AM IST
-async def send_daily_poll(context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_poll(
+# Job functions
+async def send_daily_reminder():
+    await app.bot.send_message(chat_id=GROUP_CHAT_ID, text="🌞 6:30 PM – Consistency beats talent — DSA grind mode: ON 🔥 Let’s go!")
+
+async def send_daily_poll():
+    await app.bot.send_poll(
         chat_id=GROUP_CHAT_ID,
-        question="🌙 How many DSA problems did you crush today?",
-        options=["1", "2", "3", "3+"],
-        is_anonymous=False,
-        allows_multiple_answers=False,
+        question="🧠 Midnight Check-in! How many problems did you solve today?",
+        options=["0️⃣ - Today’s problems: zero solved, infinite excuses! 😂 " , "1️⃣ - One problem down, thousands to go! 😅","2️⃣ - Two problems done, brain feeling twice as smart! 🤓" ,"3️⃣ - Three today? Someone’s on fire! 🔥", "3️⃣+ - Coding legend in the making! Bow down! 👑"],
+        is_anonymous=False
     )
 
-# 3. Welcome new members
-async def welcome_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    for user in update.message.new_chat_members:
-        await update.message.reply_text(
-            f"👋 Welcome {user.first_name}!\n"
-            "Please introduce yourself and let us know your DSA or Spring Boot progress! 🚀"
-        )
+async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.chat.type in ["group", "supergroup"]:
+        for user in update.message.new_chat_members:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"👋 Welcome, {user.mention_html()}!\n Drop a Quicl intro & Tell us about your DSA & Development progress!",
+                parse_mode='HTML'
+            )
 
-# Create app and run it
-app = ApplicationBuilder().token(TOKEN).build()
+async def main():
+    global app
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-# Schedule jobs
-scheduler = AsyncIOScheduler(timezone="Asia/Kolkata")
-scheduler.add_job(send_daily_reminder, CronTrigger(hour=18, minute=30), kwargs={"context": app})
-scheduler.add_job(send_daily_poll, CronTrigger(hour=0, minute=0), kwargs={"context": app})
-scheduler.start()
+    # Scheduler setup
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(send_daily_reminder, CronTrigger(hour=18, minute=30, timezone="Asia/Kolkata"))
+    scheduler.add_job(send_daily_poll, CronTrigger(hour=0, minute=0, timezone="Asia/Kolkata"))
+    scheduler.start()
 
-# Add handlers
-app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_member))
+    # Handlers
+    app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome))
 
-# Start bot
-app.run_polling()
+    # Start bot
+    await app.run_polling()
+
+# Run
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
