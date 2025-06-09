@@ -24,8 +24,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def daily_reminder(context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=os.getenv("GROUP_CHAT_ID"),
-        #text="🌟 It's 6:30 PM! Time to share your DSA & Spring Boot progress! 🚀"
-        text="Bot Testing for Reminders"
+        text="🧩 Reminder: One LeetCode a day keeps the regrets away!"
+        
         
     )
 
@@ -33,7 +33,7 @@ async def send_poll(context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_poll(
         chat_id=os.getenv("GROUP_CHAT_ID"),
         question="🧠 How many problems did you solve today?",
-        options=["1", "2", "3", "3+ 🤯"],
+        options=["1️⃣ - One problem down, thousands to go! 😅", "2️⃣ - Two problems done, brain feeling twice as smart! 🤓", "3️⃣ - Three today? Someone’s on fire! 🔥", "3️⃣+ - Coding legend in the making! Bow down! 👑"],
         is_anonymous=False
     )
 
