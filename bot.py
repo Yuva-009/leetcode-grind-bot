@@ -55,14 +55,14 @@ async def post_init(application):
     # Schedule 6:30 PM reminder
     job_queue.run_daily(
         callback=daily_reminder,
-        time=pytz.time(18, 30, 0, tzinfo=TIMEZONE),
+        time=time(18, 30, 0, tzinfo=TIMEZONE),
         name="daily_reminder"
     )
 
     # Schedule 12:00 AM poll
     job_queue.run_daily(
         callback=send_poll,
-        time=pytz.time(0, 0, 0, tzinfo=TIMEZONE),
+        time=time(0, 0, 0, tzinfo=TIMEZONE),
         name="midnight_poll"
     )
 
