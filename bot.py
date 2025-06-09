@@ -55,15 +55,12 @@ async def post_init(application):
     job_queue = application.job_queue
 
     # Schedule 6:30 PM reminder
-    #job_queue.run_daily(
-        #callback=daily_reminder,
-       # time=time(18, 30, 0, tzinfo=TIMEZONE),
-        #name="daily_reminder"
-   # )
-    job_queue.run_daily(
+     job_queue.run_daily(
         callback=daily_reminder,
-        time=time(22, 35, 0, tzinfo=TIMEZONE),
+        time=time(18, 30, 0, tzinfo=TIMEZONE),
         name="daily_reminder"
+    )
+    
     )
 
     # Schedule 12:00 AM poll
