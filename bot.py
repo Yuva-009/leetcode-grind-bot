@@ -17,8 +17,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 nest_asyncio.apply()
 
 # === Replace these ===
-TOKEN = "YOUR_BOT_TOKEN"  # Replace with your bot token
-GROUP_CHAT_ID = -123456789  # Replace with your group ID
+TOKEN = "7842828813:AAG7QpuH7JIYDqLFtq66SCVekqoDeIK1lbg"  # Replace with your bot token
+GROUP_CHAT_ID = -1002556002177  # Replace with your group ID
 
 IST = pytz.timezone("Asia/Kolkata")
 
