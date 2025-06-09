@@ -10,8 +10,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 # Replace these
-TOKEN = "YOUR_BOT_TOKEN"
-GROUP_CHAT_ID = -100xxxxxxxxxx  # Replace with your Telegram group chat ID
+TOKEN = "7842828813:AAG7QpuH7JIYDqLFtq66SCVekqoDeIK1lbg"
+GROUP_CHAT_ID = -1002556002177  # Replace with your Telegram group chat ID
 
 # 1. Daily reminder at 6:30 PM IST
 async def send_daily_reminder(context: ContextTypes.DEFAULT_TYPE):
