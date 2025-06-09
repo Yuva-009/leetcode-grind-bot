@@ -24,7 +24,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def daily_reminder(context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=os.getenv("GROUP_CHAT_ID"),
-        //text="🌟 It's 6:30 PM! Time to share your DSA & Spring Boot progress! 🚀"
+        #text="🌟 It's 6:30 PM! Time to share your DSA & Spring Boot progress! 🚀"
         text="Bot Testing for Reminders"
         
     )
@@ -55,14 +55,14 @@ async def post_init(application):
     job_queue = application.job_queue
 
     # Schedule 6:30 PM reminder
+    #job_queue.run_daily(
+        #callback=daily_reminder,
+       # time=time(18, 30, 0, tzinfo=TIMEZONE),
+        #name="daily_reminder"
+   # )
     job_queue.run_daily(
         callback=daily_reminder,
-        time=time(18, 30, 0, tzinfo=TIMEZONE),
-        name="daily_reminder"
-    )
-    job_queue.run_daily(
-        callback=daily_reminder,
-        time=time(22, 33, 0, tzinfo=TIMEZONE),
+        time=time(22, 35, 0, tzinfo=TIMEZONE),
         name="daily_reminder"
     )
 
