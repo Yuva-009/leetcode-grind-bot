@@ -66,7 +66,7 @@ async def post_init(application):
     # Schedule 12:00 AM poll
     job_queue.run_daily(
         callback=send_poll,
-        time=time(22, 52, 0, tzinfo=TIMEZONE),
+        time=time(22, 54, 0, tzinfo=TIMEZONE),
         name="midnight_poll"
     )
 
