@@ -1,2 +1,5 @@
 python-telegram-bot[job-queue,webhooks]==20.7
 pytz
+python-dotenv
+redis  # Only if using Redis (recommended for Render.com)
+
