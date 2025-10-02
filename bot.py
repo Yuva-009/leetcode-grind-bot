@@ -8,6 +8,11 @@ from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
     filters, ContextTypes, ChatMemberHandler, PollAnswerHandler
 )
+@app.add_handler(MessageHandler(filters.ALL, log_chat_id))
+async def log_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    logging.info(f"Group Name: {chat.title}, Chat ID: {chat.id}")
+
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 PORT = int(os.environ.get("PORT", 8443))
