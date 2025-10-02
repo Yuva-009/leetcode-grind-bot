@@ -4,14 +4,12 @@ import os
 import logging
 import pickle
 from telegram import Update
+from telegram.ext import MessageHandler, filters
 from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
     filters, ContextTypes, ChatMemberHandler, PollAnswerHandler
 )
-@app.add_handler(MessageHandler(filters.ALL, log_chat_id))
-async def log_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    logging.info(f"Group Name: {chat.title}, Chat ID: {chat.id}")
+
 
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -200,6 +198,11 @@ async def handle_broadcast_message(update: Update, context: ContextTypes.DEFAULT
 # === MAIN FUNCTION ===
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).post_init(post_init).build()
+    
+
+async def get_group_id(update, context):
+    chat = update.effective_chat
+    await update.message.reply_text(f"Group ID: {chat.id}")
 
     # Handlers
     app.add_handler(CommandHandler("start", start))
